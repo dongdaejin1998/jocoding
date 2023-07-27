@@ -4,6 +4,8 @@ import torch
 from PIL import Image
 from torchvision import transforms
 import math
+import json
+import sys
 
 import torch.nn.functional as F
 from torch import nn
@@ -17,6 +19,15 @@ import torchvision.models as models
 
 from efficientnet_pytorch import EfficientNet
 from torch import linalg
+
+
+#model_path="./CustomArc_efficientnet.pth"
+model_weight_path="./CustomArc_efficientnet.pth"
+
+input_data = "${inputData}"
+
+image = Image.open(io.BytesIO(base64.b64decode(input_data)))
+
 
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features, scale=30.0, margin=0.50, device='cuda'):
@@ -68,12 +79,7 @@ class CustomArc_efficientnet(nn.Module):
 
         return features
     
-#model_path="./CustomArc_efficientnet.pth"
-model_weight_path="./CustomArc_efficientnet.pth"
 
-input_data = "${inputData}"
-
-image = Image.open(io.BytesIO(base64.b64decode(input_data)))
 
 class CustomArc_efficientnet(torch.nn.Module):
     def __init__(self):
@@ -101,17 +107,22 @@ def load_model(model,model_weight_path):
     return model
 
 if __name__ == "__main__":
-    model=CustomArc_efficientnet(num_classes=5)
-    model = load_model(model,model_weight_path)
-    
-    model.eval()
-    transform = transforms.Compose([transforms.Resize((112, 112)), transforms.ToTensor()])
-    input_tensor = transform(image).unsqueeze(0)
-    # 모델에 입력하여 예측 수행
-    with torch.no_grad():
-        output = model(input_tensor)
-    prediction = output[0].item()
-
-    # 예측값 반환
-    print(prediction)
+    try:
+        image_data=json.loads(sys.stdin.read())
+        model=CustomArc_efficientnet(num_classes=5)
+        model = load_model(model,model_weight_path)
+        
+        model.eval()
+        transform = transforms.Compose([transforms.Resize((112, 112)), transforms.ToTensor()])
+        input_tensor = transform(image_data).unsqueeze(0)
+        # 모델에 입력하여 예측 수행
+        with torch.no_grad():
+            output = model(input_tensor)
+        prediction = output[0].item()
+        sys.stdout.write(json.dumps(prediction))
+        sys.stdout.flush()
+        sys.exit(0)
+    except Exception as e:
+        sys.stderr.write(str(e))
+        sys.exit(1)
 
