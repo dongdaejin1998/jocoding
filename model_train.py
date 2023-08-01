@@ -22,7 +22,7 @@ from torch import linalg
 
 
 #model_path="./CustomArc_efficientnet.pth"
-model_weight_path="./CustomArc_efficientnet.pth"
+model_weight_path="CustomArc_efficientnet.pth"
 
 input_data = "${inputData}"
 
@@ -102,7 +102,7 @@ def predict(model, input_data):
 # 모델 인스턴스 생성 및 학습된 가중치 불러오기
 def load_model(model,model_weight_path):
     model = torch.load(model)
-    model.load_state_dict(torch.load(model_weight_path))
+    model.load_state_dict(torch.load(model_weight_path),map_location=torch.device('cpu'))
     model.eval()
     return model
 
