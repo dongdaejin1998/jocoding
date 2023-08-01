@@ -1,28 +1,21 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 from collections import OrderedDict
 from torch.nn import init
 import math
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
-# 옵션을 선언해주면 에러가 발생하지 않습니다.
 from PIL import ImageFile
-from torchvision import transforms
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import torch
-from PIL import Image
-from torchvision import transforms
 import base64
 from io import BytesIO
 import numpy as np
 import os
 import sys
 import cv2
-
 
 class_labels = ['하트형/역삼각형 얼굴', '긴 얼굴', '계란형 얼굴', '둥근형 얼굴', '네모형/각진얼굴']
 
